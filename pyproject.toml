@@ -1,5 +1,5 @@
 [project]
-authors = [{name = "liuyifan", email = "lyf369562@alibaba-inc.com"}]
+authors = [{ name = "liuyifan", email = "luffbee@outlook.com" }]
 dependencies = []
 name = "dev_noti"
 requires-python = ">= 3.11"
@@ -12,11 +12,23 @@ requires = ["hatchling"]
 [tool.pixi.workspace]
 channels = ["conda-forge"]
 platforms = ["linux-64"]
+preview = ["pixi-build"]
 
 [tool.pixi.pypi-dependencies]
 dev_noti = { path = ".", editable = true }
 
 [tool.pixi.tasks]
+
+[tool.pixi.package.build]
+backend = { name = "pixi-build-python", version = "*" }
+channels = [
+    "https://prefix.dev/pixi-build-backends",
+    "https://prefix.dev/conda-forge",
+]
+
+
+[tool.pixi.package.host-dependencies]
+hatchling = "*"
 
 [tool.pixi.dependencies]
 async-lru = ">=2.0.5,<3"
