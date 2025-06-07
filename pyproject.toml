@@ -30,10 +30,17 @@ channels = [
 [tool.pixi.package.host-dependencies]
 hatchling = "*"
 
-[tool.pixi.dependencies]
+[tool.pixi.package.run-dependencies]
 async-lru = ">=2.0.5,<3"
 python-telegram-bot = ">=22.1,<23"
 structlog = ">=25.4.0,<26"
 tomli = ">=2.2.1,<3"
+aiohttp = ">=3.12.8,<4"
+
+[tool.pixi.dependencies]
 ipykernel = ">=6.29.5,<7"
+async-lru = ">=2.0.5,<3"
+python-telegram-bot = ">=22.1,<23"
+structlog = ">=25.4.0,<26"
+tomli = ">=2.2.1,<3"
 aiohttp = ">=3.12.8,<4"
