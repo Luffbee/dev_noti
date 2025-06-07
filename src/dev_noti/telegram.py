@@ -1,29 +1,43 @@
-import asyncio
-from datetime import datetime
+from dataclasses import dataclass
 from pathlib import Path
 
-from async_lru import alru_cache
-from structlog.stdlib import get_logger
 from telegram import Bot
 from telegram.constants import ChatType
 
+from .base import NotiBase
 
-class TGNoti:
-    def __init__(self, *, token: str, username: str):
-        self.bot = Bot(token=token)
-        self.username = username
-        self.log = get_logger(app="TGNoti").bind(username=username)
+
+@dataclass(frozen=True)
+class TelegramConfig:
+    token: str
+    username: str
+
+
+class TelegramNoti(NotiBase):
+    def __init__(self, app: str, config: TelegramConfig):
+        super().__init__(app=app)
+        self.config = config
+        self.bot = Bot(token=config.token)
+        self.username = config.username
+        self.chat_id: int | None = None
 
     @classmethod
-    def from_toml(cls, fpath: Path):
+    def from_toml(cls, *, app: str, config: Path | str):
         import tomli
 
-        with open(fpath, "rb") as f:
-            config = tomli.load(f)
-        return cls(token=config["auth"]["token"], username=config["auth"]["username"])
+        KEY = "telegram"
 
-    @alru_cache
+        with open(config, "rb") as f:
+            config_vals = tomli.load(f)
+        assert KEY in config_vals, f"{KEY} not found in config"
+        return cls(
+            app=app,
+            config=TelegramConfig(**config_vals[KEY]),
+        )
+
     async def async_chat_id(self) -> int:
+        if self.chat_id is not None:
+            return self.chat_id
         ret = await self.bot.get_updates()
         for m in ret:
             msg = m.message
@@ -34,18 +48,9 @@ class TGNoti:
             ):
                 continue
             self.log.info("found chat id", chat_id=msg.chat.id)
-            return msg.chat.id
+            self.chat_id = msg.chat.id
+            return self.chat_id
         raise ValueError("No chat id found")
 
-    async def async_send(self, msg: str):
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        try:
-            await self.bot.send_message(
-                chat_id=await self.async_chat_id(), text=f"{now}: {msg}"
-            )
-            self.log.debug("msg sent", msg=msg)
-        except Exception as e:
-            self.log.error("msg send failed", msg=msg, error=e)
-
-    def send(self, msg: str):
-        asyncio.run(self.async_send(msg))
+    async def _async_send(self, msg: str):
+        await self.bot.send_message(chat_id=await self.async_chat_id(), text=msg)

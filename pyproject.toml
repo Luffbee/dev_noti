@@ -1,9 +1,9 @@
 [project]
 authors = [{ name = "liuyifan", email = "luffbee@outlook.com" }]
-dependencies = []
 name = "dev_noti"
 requires-python = ">= 3.11"
 version = "0.1.0"
+dependencies = []
 
 [build-system]
 build-backend = "hatchling.build"
@@ -35,3 +35,5 @@ async-lru = ">=2.0.5,<3"
 python-telegram-bot = ">=22.1,<23"
 structlog = ">=25.4.0,<26"
 tomli = ">=2.2.1,<3"
+ipykernel = ">=6.29.5,<7"
+aiohttp = ">=3.12.8,<4"

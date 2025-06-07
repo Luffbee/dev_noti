@@ -2,4 +2,9 @@
 # pixi environments
 .pixi
 *.egg-info
+
+# python
+__pycache__
+
+# secret config
 dev_noti.toml
