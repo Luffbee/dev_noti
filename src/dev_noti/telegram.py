@@ -1,8 +1,5 @@
 from dataclasses import dataclass
-from pathlib import Path
-
-from telegram import Bot
-from telegram.constants import ChatType
+from typing import Any
 
 from .base import NotiBase
 
@@ -15,6 +12,8 @@ class TelegramConfig:
 
 class TelegramNoti(NotiBase):
     def __init__(self, app: str, config: TelegramConfig):
+        from telegram import Bot
+
         super().__init__(app=app)
         self.config = config
         self.bot = Bot(token=config.token)
@@ -22,20 +21,19 @@ class TelegramNoti(NotiBase):
         self.chat_id: int | None = None
 
     @classmethod
-    def from_toml(cls, *, app: str, config: Path | str):
-        import tomli
-
-        KEY = "telegram"
-
-        with open(config, "rb") as f:
-            config_vals = tomli.load(f)
-        assert KEY in config_vals, f"{KEY} not found in config"
+    def from_dict(cls, *, app: str, config: dict[str, Any]):
         return cls(
             app=app,
-            config=TelegramConfig(**config_vals[KEY]),
+            config=TelegramConfig(**config),
         )
 
+    @classmethod
+    def toml_key(cls):
+        return "telegram"
+
     async def async_chat_id(self) -> int:
+        from telegram.constants import ChatType
+
         if self.chat_id is not None:
             return self.chat_id
         ret = await self.bot.get_updates()

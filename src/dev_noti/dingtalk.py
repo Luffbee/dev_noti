@@ -1,12 +1,6 @@
-import base64
-import hashlib
-import hmac
-import time
-import urllib.parse
 from dataclasses import dataclass
-from pathlib import Path
+from typing import Any
 
-import aiohttp
 from .base import NotiBase
 
 
@@ -22,20 +16,23 @@ class DingTalkNoti(NotiBase):
         self.config = config
 
     @classmethod
-    def from_toml(cls, *, app: str, config: Path | str):
-        import tomli
-
-        KEY = "dingtalk"
-
-        with open(config, "rb") as f:
-            config_vals = tomli.load(f)
-        assert KEY in config_vals, f"{KEY} not found in config"
+    def from_dict(cls, *, app: str, config: dict[str, Any]):
         return cls(
             app=app,
-            config=DingTalkBotConfig(**config_vals[KEY]),
+            config=DingTalkBotConfig(**config),
         )
 
+    @classmethod
+    def toml_key(cls):
+        return "dingtalk"
+
     def get_sign(self):
+        import base64
+        import hashlib
+        import hmac
+        import time
+        import urllib.parse
+
         timestamp = str(round(time.time() * 1000))
         secret_enc = self.config.secret.encode("utf-8")
         string_to_sign = "{}\n{}".format(timestamp, self.config.secret)
@@ -47,6 +44,8 @@ class DingTalkNoti(NotiBase):
         return timestamp, sign
 
     async def _async_send(self, msg: str):
+        import aiohttp
+
         ts, sign = self.get_sign()
         async with aiohttp.ClientSession() as session:
             async with session.post(
