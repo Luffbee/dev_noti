@@ -277,7 +277,7 @@ packages:
 - conda: .
   name: dev_noti
   version: 0.1.1
-  build: pyhbf21a9e_0
+  build: pyh4616a5c_0
   subdir: noarch
   depends:
   - async-lru >=2.0.5,<3
@@ -285,9 +285,10 @@ packages:
   - structlog >=25.4.0,<26
   - aiohttp >=3.12.8,<4
   - cappa >=0.28.0,<0.29
-  - python
+  - python >=3.11
+  - python *
   input:
-    hash: 93c768e2882ba6a69e146b80340654f9c90e134b3a1eed863b5632ae7fb21c4b
+    hash: 6aca0cca16b0a834a63b4e0a87c24b5b4bdd2cc2646ccef07a47e275d9fb27df
     globs:
     - pyproject.toml
 - conda: https://conda.anaconda.org/conda-forge/noarch/eval_type_backport-0.2.2-pyha770c72_0.conda
